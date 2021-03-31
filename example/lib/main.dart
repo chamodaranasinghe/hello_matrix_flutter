@@ -69,7 +69,7 @@ class _MyAppState extends State<MyApp> {
                   }:null),
               Text('Rooms'),
               Container(
-                height: 400,
+                height: 200,
                 child: StreamBuilder(
                     stream: HelloMatrixFlutter.liveRoomList,
                     builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
@@ -81,13 +81,36 @@ class _MyAppState extends State<MyApp> {
                          itemCount: list.length,
                          itemBuilder: (context, i) {
                            var room = list[i];
-                           List<dynamic> typingUsers = room['typingUsers'];
-                           List<dynamic> aliases = room['aliases'];
                             return ListTile(
-                              title: Text(room['displayName']),
-                              subtitle: Text(room['breadcrumbsIndex'].toString()),
+                              title: Text(room['roomName']),
+                              subtitle: Text(room['roomTopic'].toString()),
                             );
                          });
+                    }),
+              ),
+              Text('Users'),
+              Container(
+                height: 200,
+                child: StreamBuilder(
+                    stream: HelloMatrixFlutter.liveUserList,
+                    builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+                      if(snapshot==null || !snapshot.hasData)
+                        return Container();
+                      List<dynamic> list = json.decode(snapshot.data);
+                      return ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: list.length,
+                          itemBuilder: (context, i) {
+                            var user = list[i];
+                            return ListTile(
+                              title: user['displayName']!=null?Text(user['displayName']):Text('N/A'),
+                              subtitle: Text(user['userId'].toString()),
+                              onTap: ()async{
+                                bool result = await HelloMatrixFlutter.createDirectRoom(user['userId'].toString());
+                                print(result);
+                              },
+                            );
+                          });
                     }),
               ),
             ],
@@ -96,4 +119,5 @@ class _MyAppState extends State<MyApp> {
       ),
     );
   }
+
 }

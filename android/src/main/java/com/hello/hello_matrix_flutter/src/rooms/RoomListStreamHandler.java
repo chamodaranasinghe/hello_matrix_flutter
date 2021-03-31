@@ -11,7 +11,9 @@ import org.matrix.android.sdk.api.session.content.ContentUrlResolver;
 import org.matrix.android.sdk.api.session.room.RoomSummaryQueryParams;
 import org.matrix.android.sdk.api.session.room.model.RoomSummary;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import io.flutter.plugin.common.EventChannel;
 
@@ -22,8 +24,19 @@ public class RoomListStreamHandler implements EventChannel.StreamHandler {
     Observer observer = new Observer<List<RoomSummary>>() {
         @Override
         public void onChanged(List<RoomSummary> roomSummaries) {
-            if(eventSink!=null){
-                eventSink.success(new Gson().toJson(roomSummaries));
+            if (eventSink != null) {
+                List<RoomSummaryLite> rooms = new ArrayList<>();
+                for (RoomSummary room : roomSummaries) {
+                    RoomSummaryLite roomSummaryLite = new RoomSummaryLite();
+                    roomSummaryLite.roomId = room.getRoomId();
+                    roomSummaryLite.roomName = room.getDisplayName();
+                    roomSummaryLite.roomTopic = room.getTopic();
+                    roomSummaryLite.isDirect = room.isDirect();
+                    roomSummaryLite.notificationCount = room.getNotificationCount();
+                    roomSummaryLite.avatarUrl = resolveAvatarUrl(room.getAvatarUrl());
+                    rooms.add(roomSummaryLite);
+                }
+                eventSink.success(new Gson().toJson(rooms));
             }
         }
     };
@@ -37,6 +50,12 @@ public class RoomListStreamHandler implements EventChannel.StreamHandler {
     @Override
     public void onCancel(Object arguments) {
         SessionHolder.matrixSession.getRoomSummariesLive(new RoomSummaryQueryParams.Builder().build()).removeObserver(observer);
-        eventSink=null;
+        eventSink = null;
+    }
+    
+    private String resolveAvatarUrl(String url){
+        if(url.isEmpty())
+            return "";
+        return SessionHolder.matrixSession.contentUrlResolver().resolveThumbnail(url,250,250, ContentUrlResolver.ThumbnailMethod.SCALE);
     }
 }

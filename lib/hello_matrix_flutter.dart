@@ -10,6 +10,9 @@ class HelloMatrixFlutter {
   static const EventChannel _channelRoomList =
       const EventChannel('hello_matrix_flutter/roomListEvents');
 
+  static const EventChannel _channelUserList =
+  const EventChannel('hello_matrix_flutter/userListEvents');
+
   static Future<bool> checkSession() async {
     final bool result = await _channel.invokeMethod("checkSession");
     return result;
@@ -30,11 +33,15 @@ class HelloMatrixFlutter {
     return result;
   }
 
-  /*static void listenRooms() async{
-    _channelRoomList.receiveBroadcastStream().listen((event) {
-      print('received event $event');
+  static Future<bool> createDirectRoom(
+      String userId) async {
+    final bool result = await _channel.invokeMethod("createDirectRoom", {
+      'userId': userId
     });
-  }*/
+    return result;
+  }
 
   static Stream get liveRoomList => _channelRoomList.receiveBroadcastStream();
+
+  static Stream get liveUserList => _channelUserList.receiveBroadcastStream();
 }

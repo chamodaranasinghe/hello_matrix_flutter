@@ -33,10 +33,19 @@ class HelloMatrixFlutter {
     return result;
   }
 
-  static Future<bool> createDirectRoom(
+  static Future<String> createDirectRoom(
       String userId) async {
-    final bool result = await _channel.invokeMethod("createDirectRoom", {
+    final String result = await _channel.invokeMethod("createDirectRoom", {
       'userId': userId
+    });
+    return result;
+  }
+
+  static Future<bool> sendSimpleTextMessage(
+      String roomId, String body) async {
+    final bool result = await _channel.invokeMethod("sendSimpleTextMessage", {
+      'roomId': roomId,
+      'body': body,
     });
     return result;
   }

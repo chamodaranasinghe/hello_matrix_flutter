@@ -26,12 +26,18 @@ public class UserListStreamHandler implements EventChannel.StreamHandler  {
 
     @Override
     public void onListen(Object arguments, EventChannel.EventSink events) {
+        if(SessionHolder.matrixSession==null){
+            return;
+        }
         eventSink = events;
         SessionHolder.matrixSession.getUsersLive().observeForever(observer);
     }
 
     @Override
     public void onCancel(Object arguments) {
+        if(SessionHolder.matrixSession==null){
+            return;
+        }
         SessionHolder.matrixSession.getUsersLive().removeObserver(observer);
         eventSink=null;
 

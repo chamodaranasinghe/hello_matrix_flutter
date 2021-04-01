@@ -5,6 +5,7 @@ import 'dart:async';
 
 import 'package:flutter/services.dart';
 import 'package:hello_matrix_flutter/hello_matrix_flutter.dart';
+import 'room_details.dart';
 
 void main() {
   runApp(MyApp());
@@ -106,7 +107,11 @@ class _MyAppState extends State<MyApp> {
                               title: user['displayName']!=null?Text(user['displayName']):Text('N/A'),
                               subtitle: Text(user['userId'].toString()),
                               onTap: ()async{
-                                bool result = await HelloMatrixFlutter.createDirectRoom(user['userId'].toString());
+                                String result = await HelloMatrixFlutter.createDirectRoom(user['userId'].toString());
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => RoomDetails(roomId: result,)),
+                                );
                                 print(result);
                               },
                             );

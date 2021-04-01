@@ -7,4 +7,6 @@ public class RoomSummaryLite {
     String avatarUrl;
     boolean isDirect;
     int notificationCount;
+    long originServerLastEventTs;
+    long localLastEventTs;
 }

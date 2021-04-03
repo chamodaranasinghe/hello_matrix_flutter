@@ -43,6 +43,9 @@ public class HelloMatrixFlutterPluginMethodChannel implements MethodChannel.Meth
             case"destroyTimeLine":
                 roomController.destroyTimeLine();
                 break;
+            case"joinRoom":
+                roomController.joinRoom(result,call.argument("roomId").toString());
+                break;
             default:
                 result.notImplemented();
                 return;

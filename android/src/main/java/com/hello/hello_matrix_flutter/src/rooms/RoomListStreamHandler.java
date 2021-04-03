@@ -34,12 +34,14 @@ public class RoomListStreamHandler implements EventChannel.StreamHandler {
                     roomSummaryLite.isDirect = room.isDirect();
                     roomSummaryLite.notificationCount = room.getNotificationCount();
                     roomSummaryLite.avatarUrl = resolveAvatarUrl(room.getAvatarUrl());
-                    if(room.getLatestPreviewableEvent().getRoot()!=null){
+                    if(room.getLatestPreviewableEvent()!=null){
                         roomSummaryLite.originServerLastEventTs = room.getLatestPreviewableEvent().getRoot().getOriginServerTs();
+                        roomSummaryLite.localLastEventTs = room.getLatestPreviewableEvent().getRoot().getAgeLocalTs();
                     }else{
                         roomSummaryLite.originServerLastEventTs = 0;
+                        roomSummaryLite.localLastEventTs = 0;
                     }
-                    roomSummaryLite.localLastEventTs = room.getLatestPreviewableEvent().getRoot().getAgeLocalTs();
+                    roomSummaryLite.membership = room.getMembership().getValue();
                     rooms.add(roomSummaryLite);
                 }
                 Collections.sort(rooms, new Comparator<RoomSummaryLite>() {
@@ -61,6 +63,7 @@ public class RoomListStreamHandler implements EventChannel.StreamHandler {
                         j.put("avatarUrl", roomLite.avatarUrl);
                         j.put("originServerLastEventTs", roomLite.originServerLastEventTs);
                         j.put("localLastEventTs", roomLite.localLastEventTs);
+                        j.put("membership", roomLite.membership);
                         jsonArrayRooms.put(j);
                     }catch (Exception e){
                         e.printStackTrace();
@@ -90,6 +93,7 @@ public class RoomListStreamHandler implements EventChannel.StreamHandler {
     }
     
     private String resolveAvatarUrl(String url){
+
         if(url.isEmpty())
             return "";
         return SessionHolder.matrixSession.contentUrlResolver().resolveThumbnail(url,250,250, ContentUrlResolver.ThumbnailMethod.SCALE);

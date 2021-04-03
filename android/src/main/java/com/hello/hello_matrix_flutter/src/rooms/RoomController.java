@@ -11,8 +11,11 @@ import org.matrix.android.sdk.api.session.room.Room;
 import org.matrix.android.sdk.api.session.room.model.create.CreateRoomParams;
 import org.matrix.android.sdk.api.session.room.model.message.MessageType;
 
+import java.util.ArrayList;
+
 import io.flutter.Log;
 import io.flutter.plugin.common.MethodChannel;
+import kotlin.Unit;
 
 public class RoomController {
 
@@ -21,7 +24,6 @@ public class RoomController {
     ChatTimeLine chatTimeLine;
 
     public void createDirectRoom(@NonNull final MethodChannel.Result result, final String userId) {
-
         Room existingRoom = SessionHolder.matrixSession.getExistingDirectRoomWithUser(userId);
         if(existingRoom!=null){
             Log.i(_tag, "room already exist"+" "+existingRoom.getRoomId());
@@ -61,6 +63,21 @@ public class RoomController {
 
     public void createTimeLine(String roomId){
         chatTimeLine = new ChatTimeLine(roomId);
+    }
+
+    public void joinRoom(@NonNull final MethodChannel.Result result,String roomId){
+        Room room = SessionHolder.matrixSession.getRoom(roomId);
+        room.join("", new ArrayList<String>(), new MatrixCallback<Unit>() {
+            @Override
+            public void onSuccess(Unit unit) {
+                result.success(true);
+            }
+
+            @Override
+            public void onFailure(@NotNull Throwable throwable) {
+                result.success(false);
+            }
+        });
     }
 
     public void destroyTimeLine(){

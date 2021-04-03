@@ -52,6 +52,13 @@ class HelloMatrixFlutter {
     });
     return result;
   }
+  static Future<bool> joinRoom(
+      String roomId) async {
+    final bool result = await _channel.invokeMethod("joinRoom", {
+      'roomId': roomId
+    });
+    return result;
+  }
 
   static Future<void> createTimeLine(String roomId) async{
     await _channel.invokeMethod("createTimeLine", {

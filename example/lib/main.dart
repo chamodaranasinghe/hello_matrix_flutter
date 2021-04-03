@@ -59,7 +59,7 @@ class _MyAppState extends State<MyApp> {
               ElevatedButton(
                   child: Text('Login'),
                   onPressed: !_sessionStatusBool?  ()async{
-                    await HelloMatrixFlutter.login('https://h1.hellodesk.app', 'chamodam@gmail.com', 'password');
+                    await HelloMatrixFlutter.login('https://h1.hellodesk.app', 'jd@gmail.com', 'abc123');
                     await checkSession();
                   }:null),
               ElevatedButton(
@@ -77,12 +77,33 @@ class _MyAppState extends State<MyApp> {
                       if(snapshot==null || !snapshot.hasData)
                         return Container();
                       List<dynamic> list = json.decode(snapshot.data);
+                      //print(list);
                      return ListView.builder(
                          shrinkWrap: true,
                          itemCount: list.length,
                          itemBuilder: (context, i) {
                            var room = list[i];
+                            print(room);
                             return ListTile(
+                              onTap: ()async{
+                                if(room['membership']=='invite'){
+                                  bool joinStatus =  await HelloMatrixFlutter.joinRoom(room['roomId']);
+                                  print('joinStatus $joinStatus');
+                                  if(joinStatus){
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(builder: (context) => RoomDetails(roomId: room['roomId'].toString(),)),
+                                    );
+                                  }
+                                }else {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (context) =>
+                                        RoomDetails(
+                                          roomId: room['roomId'].toString(),)),
+                                  );
+                                }
+                              },
                              title: Text(room['roomName'].toString()),
                               subtitle: Text(room['roomTopic'].toString()),
                             );

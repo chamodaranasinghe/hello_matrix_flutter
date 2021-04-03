@@ -4,6 +4,7 @@ public class RoomSummaryLite {
     String roomName;
     String roomTopic;
     String avatarUrl;
+    String membership;
     boolean isDirect;
     int notificationCount;
     long originServerLastEventTs;

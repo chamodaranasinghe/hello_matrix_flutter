@@ -18,6 +18,7 @@ public class RoomController {
 
 
     String _tag = "RoomController";
+    ChatTimeLine chatTimeLine;
 
     public void createDirectRoom(@NonNull final MethodChannel.Result result, final String userId) {
 
@@ -56,6 +57,15 @@ public class RoomController {
         Room room = SessionHolder.matrixSession.getRoom(roomId);
         room.sendTextMessage(body, MessageType.MSGTYPE_TEXT,false);
         result.success(true);
+    }
+
+    public void createTimeLine(String roomId){
+        chatTimeLine = new ChatTimeLine(roomId);
+    }
+
+    public void destroyTimeLine(){
+        chatTimeLine.destroyTimeLine();
+        chatTimeLine = null;
     }
 
 }

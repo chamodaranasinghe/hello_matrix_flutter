@@ -24,6 +24,9 @@ public class HelloMatrixFlutterPlugin implements FlutterPlugin {
 
   @Override
   public void onAttachedToEngine(@NonNull FlutterPluginBinding flutterPluginBinding) {
+    //set plugin binding for the entire plugin
+    PluginBindingHolder.flutterPluginBinding = flutterPluginBinding;
+
     methodChannel = new MethodChannel(flutterPluginBinding.getBinaryMessenger(), "hello_matrix_flutter");
 
     roomListEventChannel = new EventChannel(flutterPluginBinding.getBinaryMessenger(),"hello_matrix_flutter/roomListEvents");
@@ -44,6 +47,7 @@ public class HelloMatrixFlutterPlugin implements FlutterPlugin {
 
   @Override
   public void onDetachedFromEngine(@NonNull FlutterPluginBinding binding) {
+    PluginBindingHolder.flutterPluginBinding = null;
     methodChannel.setMethodCallHandler(null);
     roomListEventChannel.setStreamHandler(null);
     userListEventChannel.setStreamHandler(null);

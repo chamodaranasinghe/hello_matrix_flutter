@@ -83,7 +83,7 @@ class _MyAppState extends State<MyApp> {
                          itemBuilder: (context, i) {
                            var room = list[i];
                             return ListTile(
-                              title: Text(room['roomName']),
+                             title: Text(room['roomName'].toString()),
                               subtitle: Text(room['roomTopic'].toString()),
                             );
                          });

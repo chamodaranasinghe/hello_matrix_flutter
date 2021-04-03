@@ -1,24 +1,19 @@
 package com.hello.hello_matrix_flutter.src.rooms;
 
-import android.util.Log;
-
 import androidx.lifecycle.Observer;
 
-import com.google.gson.Gson;
 import com.hello.hello_matrix_flutter.src.auth.SessionHolder;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.matrix.android.sdk.api.session.content.ContentUrlResolver;
-import org.matrix.android.sdk.api.session.crypto.MXCryptoError;
-import org.matrix.android.sdk.api.session.events.model.Event;
 import org.matrix.android.sdk.api.session.room.RoomSummaryQueryParams;
 import org.matrix.android.sdk.api.session.room.model.RoomSummary;
-import org.matrix.android.sdk.internal.crypto.MXEventDecryptionResult;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 
 import io.flutter.plugin.common.EventChannel;
 
@@ -53,7 +48,25 @@ public class RoomListStreamHandler implements EventChannel.StreamHandler {
                         return Long.compare(roomSummaryLite.originServerLastEventTs, t1.originServerLastEventTs);
                     }
                 });
-                eventSink.success(new Gson().toJson(rooms));
+
+                JSONArray jsonArrayRooms = new JSONArray();
+                for (RoomSummaryLite roomLite : rooms) {
+                    JSONObject j = new JSONObject();
+                    try {
+                        j.put("roomId", roomLite.roomId);
+                        j.put("roomName", roomLite.roomName);
+                        j.put("roomTopic", roomLite.roomTopic);
+                        j.put("isDirect", roomLite.isDirect);
+                        j.put("notificationCount", roomLite.notificationCount);
+                        j.put("avatarUrl", roomLite.avatarUrl);
+                        j.put("originServerLastEventTs", roomLite.originServerLastEventTs);
+                        j.put("localLastEventTs", roomLite.localLastEventTs);
+                        jsonArrayRooms.put(j);
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+                eventSink.success(jsonArrayRooms.toString());
             }
         }
     };

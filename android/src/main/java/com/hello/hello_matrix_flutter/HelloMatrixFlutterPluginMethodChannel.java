@@ -37,6 +37,12 @@ public class HelloMatrixFlutterPluginMethodChannel implements MethodChannel.Meth
             case"sendSimpleTextMessage":
                 roomController.sendSimpleTextMessage(result,call.argument("roomId").toString(),call.argument("body").toString());
                 break;
+            case"createTimeLine":
+                roomController.createTimeLine(call.argument("roomId").toString());
+                break;
+            case"destroyTimeLine":
+                roomController.destroyTimeLine();
+                break;
             default:
                 result.notImplemented();
                 return;

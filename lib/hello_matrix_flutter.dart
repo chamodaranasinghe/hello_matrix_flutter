@@ -13,6 +13,9 @@ class HelloMatrixFlutter {
   static const EventChannel _channelUserList =
   const EventChannel('hello_matrix_flutter/userListEvents');
 
+  static const EventChannel _channelTimelineEvents =
+  const EventChannel('hello_matrix_flutter/timelineEvents');
+
   static Future<bool> checkSession() async {
     final bool result = await _channel.invokeMethod("checkSession");
     return result;
@@ -50,7 +53,21 @@ class HelloMatrixFlutter {
     return result;
   }
 
+  static Future<void> createTimeLine(String roomId) async{
+    await _channel.invokeMethod("createTimeLine", {
+      'roomId': roomId
+    });
+    return;
+  }
+
+  static Future<void> destroyTimeLine() async{
+    await _channel.invokeMethod("destroyTimeLine");
+    return;
+  }
+
   static Stream get liveRoomList => _channelRoomList.receiveBroadcastStream();
 
   static Stream get liveUserList => _channelUserList.receiveBroadcastStream();
+
+  static Stream get liveTimeLine => _channelTimelineEvents.receiveBroadcastStream();
 }

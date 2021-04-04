@@ -5,6 +5,7 @@ import 'dart:async';
 
 import 'package:flutter/services.dart';
 import 'package:hello_matrix_flutter/hello_matrix_flutter.dart';
+import 'package:hello_matrix_flutter_example/directory_list.dart';
 import 'room_details.dart';
 
 void main() {
@@ -70,7 +71,7 @@ class _MyAppState extends State<MyApp> {
                   }:null),
               Text('Rooms'),
               Container(
-                height: 200,
+                height: 150,
                 child: StreamBuilder(
                     stream: HelloMatrixFlutter.liveRoomList,
                     builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
@@ -83,12 +84,12 @@ class _MyAppState extends State<MyApp> {
                          itemCount: list.length,
                          itemBuilder: (context, i) {
                            var room = list[i];
-                            print(room);
+                            //print(room);
                             return ListTile(
                               onTap: ()async{
                                 if(room['membership']=='invite'){
                                   bool joinStatus =  await HelloMatrixFlutter.joinRoom(room['roomId']);
-                                  print('joinStatus $joinStatus');
+                                  //print('joinStatus $joinStatus');
                                   if(joinStatus){
                                     Navigator.push(
                                       context,
@@ -112,7 +113,7 @@ class _MyAppState extends State<MyApp> {
               ),
               Text('Users'),
               Container(
-                height: 200,
+                height: 150,
                 child: StreamBuilder(
                     stream: HelloMatrixFlutter.liveUserList,
                     builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
@@ -128,7 +129,7 @@ class _MyAppState extends State<MyApp> {
                               title: user['displayName']!=null?Text(user['displayName']):Text('N/A'),
                               subtitle: Text(user['userId'].toString()),
                               onTap: ()async{
-                                String result = await HelloMatrixFlutter.createDirectRoom(user['userId'].toString());
+                                String result = await HelloMatrixFlutter.createDirectRoom(user['userId'].toString(),user['displayName'].toString());
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(builder: (context) => RoomDetails(roomId: result,)),
@@ -139,6 +140,11 @@ class _MyAppState extends State<MyApp> {
                           });
                     }),
               ),
+              Text('Directory'),
+              Container(
+                height: 150,
+                child: DirectoryList(),
+              )
             ],
           ),
         ),

@@ -37,9 +37,10 @@ class HelloMatrixFlutter {
   }
 
   static Future<String> createDirectRoom(
-      String userId) async {
+      String userId, String roomName) async {
     final String result = await _channel.invokeMethod("createDirectRoom", {
-      'userId': userId
+      'userId': userId,
+      'roomName':roomName
     });
     return result;
   }

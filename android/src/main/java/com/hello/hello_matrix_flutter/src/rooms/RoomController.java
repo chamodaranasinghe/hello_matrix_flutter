@@ -23,7 +23,7 @@ public class RoomController {
     String _tag = "RoomController";
     ChatTimeLine chatTimeLine;
 
-    public void createDirectRoom(@NonNull final MethodChannel.Result result, final String userId) {
+    public void createDirectRoom(@NonNull final MethodChannel.Result result, final String userId, String roomName) {
         Room existingRoom = SessionHolder.matrixSession.getExistingDirectRoomWithUser(userId);
         if(existingRoom!=null){
             Log.i(_tag, "room already exist"+" "+existingRoom.getRoomId());
@@ -32,10 +32,8 @@ public class RoomController {
         }
 
         Log.i(_tag, userId);
-
-        String name = SessionHolder.matrixSession.getUser(userId).getBestName();
         CreateRoomParams createRoomParams = new CreateRoomParams();
-        createRoomParams.setName(name);
+        createRoomParams.setName(roomName);
         createRoomParams.setDirectMessage();
         createRoomParams.getInvitedUserIds().add(userId);
 

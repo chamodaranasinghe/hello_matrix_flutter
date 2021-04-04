@@ -32,7 +32,7 @@ public class HelloMatrixFlutterPluginMethodChannel implements MethodChannel.Meth
                 loginController.logout(result);
                 break;
             case"createDirectRoom":
-                roomController.createDirectRoom(result,call.argument("userId").toString());
+                roomController.createDirectRoom(result,call.argument("userId").toString(),call.argument("roomName").toString());
                 break;
             case"sendSimpleTextMessage":
                 roomController.sendSimpleTextMessage(result,call.argument("roomId").toString(),call.argument("body").toString());

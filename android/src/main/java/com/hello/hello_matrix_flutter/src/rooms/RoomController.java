@@ -34,6 +34,7 @@ public class RoomController {
         Log.i(_tag, userId);
         CreateRoomParams createRoomParams = new CreateRoomParams();
         createRoomParams.setName(roomName);
+        //createRoomParams.enableEncryption();
         createRoomParams.setDirectMessage();
         createRoomParams.getInvitedUserIds().add(userId);
 

@@ -148,6 +148,7 @@ public class ChatTimeLine implements Timeline.Listener, EventChannel.StreamHandl
             result = SessionHolder.matrixSession.cryptoService().decryptEvent(event, "");
             return result.getClearEvent();
         } catch (MXCryptoError error) {
+            error.printStackTrace();
             return null;
         }
     }

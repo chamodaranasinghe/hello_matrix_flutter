@@ -60,7 +60,7 @@ class _MyAppState extends State<MyApp> {
               ElevatedButton(
                   child: Text('Login'),
                   onPressed: !_sessionStatusBool?  ()async{
-                    await HelloMatrixFlutter.login('https://h1.hellodesk.app', 'cr@gmail.com', 'abc123');
+                    await HelloMatrixFlutter.login('https://h1.hellodesk.app', 'user1@gmail.com', 'abc123');
                     await checkSession();
                   }:null),
               ElevatedButton(
@@ -84,7 +84,6 @@ class _MyAppState extends State<MyApp> {
                          itemCount: list.length,
                          itemBuilder: (context, i) {
                            var room = list[i];
-                            //print(room);
                             return ListTile(
                               onTap: ()async{
                                 if(room['membership']=='invite'){

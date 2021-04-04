@@ -8,6 +8,6 @@ public class TimeLineEventLite {
     long localId;
     long originServerTs;
     long localTs;
-    Map<String,Object> clearedContent;
+    String clearedContent;
     String direction;
 }

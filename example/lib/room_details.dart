@@ -47,8 +47,8 @@ class _RoomDetailsState extends State<RoomDetails> {
                     reverse: true,
                     itemBuilder: (context, index) {
                       var message = messages[index];
-                      var content = messages[index]['clearedContent'];
-                      return content != null
+                      String root = messages[index]['clearedContent'];
+                      return root != null
                           ? Container(
                               padding: EdgeInsets.only(
                                   left: 14, right: 14, top: 10, bottom: 10),
@@ -65,7 +65,7 @@ class _RoomDetailsState extends State<RoomDetails> {
                                   ),
                                   padding: EdgeInsets.all(16),
                                   child: Text(
-                                    content.toString(),
+                                    json.decode(root)['body'].toString(),
                                     style: TextStyle(fontSize: 15),
                                   ),
                                 ),

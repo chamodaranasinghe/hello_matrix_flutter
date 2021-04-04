@@ -7,6 +7,7 @@ import com.hello.hello_matrix_flutter.src.auth.SessionHolder;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.matrix.android.sdk.api.session.content.ContentUrlResolver;
+import org.matrix.android.sdk.api.session.room.Room;
 import org.matrix.android.sdk.api.session.room.RoomSummaryQueryParams;
 import org.matrix.android.sdk.api.session.room.model.RoomSummary;
 
@@ -42,6 +43,7 @@ public class RoomListStreamHandler implements EventChannel.StreamHandler {
                         roomSummaryLite.localLastEventTs = 0;
                     }
                     roomSummaryLite.membership = room.getMembership().getValue();
+
                     rooms.add(roomSummaryLite);
                 }
                 Collections.sort(rooms, new Comparator<RoomSummaryLite>() {
@@ -64,6 +66,10 @@ public class RoomListStreamHandler implements EventChannel.StreamHandler {
                         j.put("originServerLastEventTs", roomLite.originServerLastEventTs);
                         j.put("localLastEventTs", roomLite.localLastEventTs);
                         j.put("membership", roomLite.membership);
+                        j.put("isEncrypted", SessionHolder.matrixSession.getRoom(roomLite.roomId).isEncrypted());
+                        j.put("encryptionAlgorithm", SessionHolder.matrixSession.getRoom(roomLite.roomId).encryptionAlgorithm());
+                        j.put("shouldEncryptForInvitedMembers", SessionHolder.matrixSession.getRoom(roomLite.roomId).shouldEncryptForInvitedMembers());
+                        
                         jsonArrayRooms.put(j);
                     }catch (Exception e){
                         e.printStackTrace();

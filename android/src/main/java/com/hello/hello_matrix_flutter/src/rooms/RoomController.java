@@ -9,6 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import org.matrix.android.sdk.api.MatrixCallback;
 import org.matrix.android.sdk.api.session.room.Room;
 import org.matrix.android.sdk.api.session.room.model.create.CreateRoomParams;
+import org.matrix.android.sdk.api.session.room.model.create.CreateRoomPreset;
 import org.matrix.android.sdk.api.session.room.model.message.MessageType;
 
 import java.util.ArrayList;
@@ -37,6 +38,7 @@ public class RoomController {
         //createRoomParams.enableEncryption();
         createRoomParams.setDirectMessage();
         createRoomParams.getInvitedUserIds().add(userId);
+        createRoomParams.setEnableEncryptionIfInvitedUsersSupportIt(false);
 
         SessionHolder.matrixSession.createRoom(createRoomParams, new MatrixCallback<String>() {
             @Override
@@ -70,6 +72,7 @@ public class RoomController {
             @Override
             public void onSuccess(Unit unit) {
                 result.success(true);
+                Log.i("Unit",unit.toString());
             }
 
             @Override

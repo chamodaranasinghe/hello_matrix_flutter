@@ -89,12 +89,19 @@ public class ChatTimeLine implements Timeline.Listener, EventChannel.StreamHandl
                 timeLineEventLite.eventId = event.getEventId();
                 timeLineEventLite.originServerTs = event.getRoot().getOriginServerTs();
                 timeLineEventLite.localTs = event.getRoot().getAgeLocalTs();
-                timeLineEventLite.clearedContent = getClearContent(event.getRoot());
+                if(event.getRoot().getType().equals("m.room.message")){
+                    timeLineEventLite.clearedContent = new JSONObject(event.getRoot().getClearContent()).toString();
+                }
                 if(event.getSenderInfo().getUserId().equals(SessionHolder.matrixSession.getMyUserId())){
                     timeLineEventLite.direction = "sent";
                 }else{
                     timeLineEventLite.direction = "received";
                 }
+
+
+                Log.i(_tag,"type "+event.getRoot().getType());
+                //Log.i(_tag,"clear type "+event.getRoot().getType());
+                //Log.i(_tag,"clear content "+event.getRoot().getClearContent());
 
                 events.add(timeLineEventLite);
             }
@@ -108,10 +115,8 @@ public class ChatTimeLine implements Timeline.Listener, EventChannel.StreamHandl
                     j.put("eventId", timeLineEventLite.eventId);
                     j.put("originServerTs", timeLineEventLite.originServerTs);
                     j.put("localTs", timeLineEventLite.localTs);
-                    if(timeLineEventLite.clearedContent!=null){
-                        Map map = timeLineEventLite.clearedContent;
-                        j.put("clearedContent", ((Map)map.get( "content" )).get( "body" ));
-                    }
+                    j.put("clearedContent", timeLineEventLite.clearedContent);
+                    Log.i(_tag,"clear content "+timeLineEventLite.clearedContent);
                     j.put("direction", timeLineEventLite.direction);
                     jsonArrayEvents.put(j);
                 }catch (Exception e){
@@ -142,15 +147,15 @@ public class ChatTimeLine implements Timeline.Listener, EventChannel.StreamHandl
         Log.i(_tag, "onCancelEvents");
     }
 
-    private Map<String, Object> getClearContent(Event event) {
+    /*private Map<String, Object> getClearContent(Event event) {
         MXEventDecryptionResult result = null;
         try {
             result = SessionHolder.matrixSession.cryptoService().decryptEvent(event, "");
             return result.getClearEvent();
         } catch (MXCryptoError error) {
-            error.printStackTrace();
+            Log.i(_tag,"encryption error");
             return null;
         }
-    }
+    }*/
 }
 

@@ -41,7 +41,7 @@ public class ChatTimeLine implements Timeline.Listener, EventChannel.StreamHandl
 
     Timeline timeline;
     TimelineSettings timelineSettings = new TimelineSettings(
-            100,
+            500,
             true,
             true,
             true,

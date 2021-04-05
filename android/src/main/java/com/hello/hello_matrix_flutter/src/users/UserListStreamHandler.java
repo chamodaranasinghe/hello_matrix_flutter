@@ -1,5 +1,7 @@
 package com.hello.hello_matrix_flutter.src.users;
 
+import android.util.Log;
+
 import androidx.lifecycle.Observer;
 
 import com.google.gson.Gson;
@@ -27,9 +29,13 @@ public class UserListStreamHandler implements EventChannel.StreamHandler {
                 for (User user : users) {
                     JSONObject j = new JSONObject();
                     try {
-                        j.put("displayName", user.getDisplayName());
-                        j.put("userId", user.getUserId());
-                        jsonArrayUsers.put(j);
+                        if(user.getUserId().equals(SessionHolder.matrixSession.getMyUserId())) {
+
+                        }else{
+                            j.put("displayName", user.getDisplayName());
+                            j.put("userId", user.getUserId());
+                            jsonArrayUsers.put(j);
+                        }
                     }catch (Exception e){
                         e.printStackTrace();
                     }

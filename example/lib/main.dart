@@ -84,6 +84,12 @@ class _MyAppState extends State<MyApp> {
                          itemCount: list.length,
                          itemBuilder: (context, i) {
                            var room = list[i];
+                           var lastContent = room['lastContent'];
+                           var lastMsg = '';
+                           if(lastContent!=null){
+                             var lastContent = json.decode(room['lastContent']);
+                             lastMsg = lastContent['body'];
+                           }
                             return ListTile(
                               onTap: ()async{
                                 if(room['membership']=='invite'){
@@ -105,7 +111,7 @@ class _MyAppState extends State<MyApp> {
                                 }
                               },
                              title: Text(room['roomName'].toString()),
-                              subtitle: Text(room['roomTopic'].toString()),
+                              subtitle: Text(lastMsg),
                             );
                          });
                     }),

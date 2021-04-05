@@ -43,6 +43,7 @@ public class RoomListStreamHandler implements EventChannel.StreamHandler {
                         roomSummaryLite.localLastEventTs = 0;
                     }
                     roomSummaryLite.membership = room.getMembership().getValue();
+                    roomSummaryLite.lastEvent = room.getLatestPreviewableEvent();
 
                     rooms.add(roomSummaryLite);
                 }
@@ -69,6 +70,12 @@ public class RoomListStreamHandler implements EventChannel.StreamHandler {
                         j.put("isEncrypted", SessionHolder.matrixSession.getRoom(roomLite.roomId).isEncrypted());
                         j.put("encryptionAlgorithm", SessionHolder.matrixSession.getRoom(roomLite.roomId).encryptionAlgorithm());
                         j.put("shouldEncryptForInvitedMembers", SessionHolder.matrixSession.getRoom(roomLite.roomId).shouldEncryptForInvitedMembers());
+                        if(roomLite.lastEvent!=null){
+                            if(roomLite.lastEvent.getRoot().getClearType().equals("m.room.message")){
+                                j.put("lastContent",new JSONObject(roomLite.lastEvent.getRoot().getClearContent()).toString());
+                            }
+
+                        }
                         
                         jsonArrayRooms.put(j);
                     }catch (Exception e){

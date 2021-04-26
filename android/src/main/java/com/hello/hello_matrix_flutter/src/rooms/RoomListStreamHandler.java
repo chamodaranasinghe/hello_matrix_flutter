@@ -3,11 +3,14 @@ package com.hello.hello_matrix_flutter.src.rooms;
 import androidx.lifecycle.Observer;
 
 import com.hello.hello_matrix_flutter.src.auth.SessionHolder;
+import com.hello.hello_matrix_flutter.src.directory.DirectoryConnector;
+import com.hello.hello_matrix_flutter.src.directory.UserProfile;
 
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.IterableUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.matrix.android.sdk.api.session.content.ContentUrlResolver;
-import org.matrix.android.sdk.api.session.room.Room;
 import org.matrix.android.sdk.api.session.room.RoomSummaryQueryParams;
 import org.matrix.android.sdk.api.session.room.model.RoomSummary;
 
@@ -28,31 +31,43 @@ public class RoomListStreamHandler implements EventChannel.StreamHandler {
             if (eventSink != null) {
                 List<RoomSummaryLite> rooms = new ArrayList<>();
                 for (RoomSummary room : roomSummaries) {
+                    //only direct rooms supported now
+                    if (!room.isDirect()) {
+                        return;
+                    }
                     RoomSummaryLite roomSummaryLite = new RoomSummaryLite();
                     roomSummaryLite.roomId = room.getRoomId();
                     roomSummaryLite.roomName = room.getDisplayName();
                     roomSummaryLite.roomTopic = room.getTopic();
                     roomSummaryLite.isDirect = room.isDirect();
                     roomSummaryLite.notificationCount = room.getNotificationCount();
-                    roomSummaryLite.avatarUrl = resolveAvatarUrl(room.getAvatarUrl());
-                    if(room.getLatestPreviewableEvent()!=null){
+                    if (room.getLatestPreviewableEvent() != null) {
                         roomSummaryLite.originServerLastEventTs = room.getLatestPreviewableEvent().getRoot().getOriginServerTs();
                         roomSummaryLite.localLastEventTs = room.getLatestPreviewableEvent().getRoot().getAgeLocalTs();
-                    }else{
+                    } else {
                         roomSummaryLite.originServerLastEventTs = 0;
                         roomSummaryLite.localLastEventTs = 0;
                     }
                     roomSummaryLite.membership = room.getMembership().getValue();
                     roomSummaryLite.lastEvent = room.getLatestPreviewableEvent();
 
+                    if (!room.getOtherMemberIds().isEmpty()) {
+                        UserProfile userProfile = DirectoryConnector.pullUserProfile(room.getOtherMemberIds().get(0));
+                        if (userProfile != null) {
+                            roomSummaryLite.otherMemberDisplayName = userProfile.firstName + " " + userProfile.lastName;
+                            roomSummaryLite.otherMemberThumbnail = userProfile.photoThumbnail;
+                        } else {
+                            roomSummaryLite.otherMemberDisplayName = SessionHolder.matrixSession.getUser(room.getOtherMemberIds().get(0)).getDisplayName();
+                            roomSummaryLite.otherMemberThumbnail = null;
+                        }
+
+                    } else {
+                        roomSummaryLite.otherMemberDisplayName = "";
+                        roomSummaryLite.otherMemberThumbnail = null;
+                    }
                     rooms.add(roomSummaryLite);
                 }
-                Collections.sort(rooms, new Comparator<RoomSummaryLite>() {
-                    @Override
-                    public int compare(RoomSummaryLite roomSummaryLite, RoomSummaryLite t1) {
-                        return Long.compare(roomSummaryLite.originServerLastEventTs, t1.originServerLastEventTs);
-                    }
-                });
+                Collections.sort(rooms, Collections.reverseOrder());
 
                 JSONArray jsonArrayRooms = new JSONArray();
                 for (RoomSummaryLite roomLite : rooms) {
@@ -70,15 +85,18 @@ public class RoomListStreamHandler implements EventChannel.StreamHandler {
                         j.put("isEncrypted", SessionHolder.matrixSession.getRoom(roomLite.roomId).isEncrypted());
                         j.put("encryptionAlgorithm", SessionHolder.matrixSession.getRoom(roomLite.roomId).encryptionAlgorithm());
                         j.put("shouldEncryptForInvitedMembers", SessionHolder.matrixSession.getRoom(roomLite.roomId).shouldEncryptForInvitedMembers());
-                        if(roomLite.lastEvent!=null){
-                            if(roomLite.lastEvent.getRoot().getClearType().equals("m.room.message")){
-                                j.put("lastContent",new JSONObject(roomLite.lastEvent.getRoot().getClearContent()).toString());
+                        if (roomLite.lastEvent != null) {
+                            if (roomLite.lastEvent.getRoot().getClearType().equals("m.room.message")) {
+                                j.put("lastContent", new JSONObject(roomLite.lastEvent.getRoot().getClearContent()).toString());
                             }
 
                         }
-                        
+                        j.put("otherMemberDisplayName", roomLite.otherMemberDisplayName);
+                        j.put("otherMemberThumbnail", roomLite.otherMemberThumbnail);
+
+
                         jsonArrayRooms.put(j);
-                    }catch (Exception e){
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
                 }
@@ -89,7 +107,7 @@ public class RoomListStreamHandler implements EventChannel.StreamHandler {
 
     @Override
     public void onListen(Object arguments, EventChannel.EventSink events) {
-        if(SessionHolder.matrixSession==null){
+        if (SessionHolder.matrixSession == null) {
             return;
         }
         eventSink = events;
@@ -98,17 +116,10 @@ public class RoomListStreamHandler implements EventChannel.StreamHandler {
 
     @Override
     public void onCancel(Object arguments) {
-        if(SessionHolder.matrixSession==null){
+        if (SessionHolder.matrixSession == null) {
             return;
         }
         SessionHolder.matrixSession.getRoomSummariesLive(new RoomSummaryQueryParams.Builder().build()).removeObserver(observer);
         eventSink = null;
-    }
-    
-    private String resolveAvatarUrl(String url){
-
-        if(url.isEmpty())
-            return "";
-        return SessionHolder.matrixSession.contentUrlResolver().resolveThumbnail(url,250,250, ContentUrlResolver.ThumbnailMethod.SCALE);
     }
 }

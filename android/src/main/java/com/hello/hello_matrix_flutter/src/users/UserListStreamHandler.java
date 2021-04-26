@@ -1,10 +1,7 @@
 package com.hello.hello_matrix_flutter.src.users;
 
-import android.util.Log;
-
 import androidx.lifecycle.Observer;
 
-import com.google.gson.Gson;
 import com.hello.hello_matrix_flutter.src.auth.SessionHolder;
 
 import org.json.JSONArray;

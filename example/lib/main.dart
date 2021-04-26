@@ -10,6 +10,16 @@ import 'room_details.dart';
 
 void main() {
   runApp(MyApp());
+
+  runApp(
+    MaterialApp(
+      debugShowCheckedModeBanner: false,
+      supportedLocales: [
+        const Locale('en', 'US'),
+      ],
+      home: MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatefulWidget {
@@ -28,23 +38,20 @@ class _MyAppState extends State<MyApp> {
     checkSession();
   }
 
-  Future<void> checkSession() async{
-    bool status = await HelloMatrixFlutter.checkSession();
+  Future<void> checkSession() async {
+    bool status = await Auth.checkSession();
 
     print(status);
     setState(() {
       _sessionStatusBool = status;
       // ignore: unnecessary_statements
-      if(status){
+      if (status) {
         _sessionStatus = 'Logged in : True';
-      }else{
+      } else {
         _sessionStatus = 'Logged in : False';
       }
     });
-
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -59,61 +66,127 @@ class _MyAppState extends State<MyApp> {
               Text(_sessionStatus),
               ElevatedButton(
                   child: Text('Login'),
-                  onPressed: !_sessionStatusBool?  ()async{
-                    await HelloMatrixFlutter.login('https://h1.hellodesk.app', 'user1@gmail.com', 'abc123');
-                    await checkSession();
-                  }:null),
-              ElevatedButton(
-                  child: Text('Logout'),
-                  onPressed: _sessionStatusBool? ()async{
-                    await HelloMatrixFlutter.logout();
-                    await checkSession();
-                  }:null),
+                  onPressed: !_sessionStatusBool
+                      ? () async {
+                          await Auth.login('https://h1.hellodesk.app',
+                              'judith@gmail.com', 'abc123');
+                          await checkSession();
+                        }
+                      : null),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ElevatedButton(
+                      child: Icon(Icons.logout),
+                      onPressed: _sessionStatusBool
+                          ? () async {
+                              await Auth.logout();
+                              await checkSession();
+                            }
+                          : null),
+                  ElevatedButton(
+                      child: Icon(Icons.person),
+                      onPressed: _sessionStatusBool
+                          ? () async {
+                              Profile profile = await Auth.getHelloProfile();
+                              if (profile != null) {
+                                showDialog(
+                                    context: context,
+                                    barrierDismissible: true,
+                                    builder: (BuildContext context) {
+                                      return AlertDialog(
+                                        title: Text('Profile'),
+                                        content: SingleChildScrollView(
+                                          child: ListBody(
+                                            children: <Widget>[
+                                              Text(
+                                                  'Hello id : ${profile.helloId}'),
+                                              Text(
+                                                  'Display name : ${profile.displayName}'),
+                                              Text('Email : ${profile.email}'),
+                                              Text(
+                                                  'Contact : ${profile.contact}'),
+                                              Text('Org. : ${profile.orgName}'),
+                                              Text(
+                                                  'Photo. : ${profile.photoUrl}'),
+                                            ],
+                                          ),
+                                        ),
+                                      );
+                                    });
+                              }
+                            }
+                          : null),
+                  ElevatedButton(
+                      child: Icon(Icons.sync),
+                      onPressed: _sessionStatusBool
+                          ? () async {
+                              bool b = await Directory.updateDirectory();
+                              print(b);
+                            }
+                          : null),
+                ],
+              ),
               Text('Rooms'),
               Container(
                 height: 150,
                 child: StreamBuilder(
-                    stream: HelloMatrixFlutter.liveRoomList,
-                    builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-                      if(snapshot==null || !snapshot.hasData)
+                    stream: LiveDirectRooms.getStream,
+                    builder: (BuildContext context,
+                        AsyncSnapshot<List<DirectRoom>> snapshot) {
+                      if (snapshot == null || !snapshot.hasData)
                         return Container();
-                      List<dynamic> list = json.decode(snapshot.data);
-                      //print(list);
-                     return ListView.builder(
-                         shrinkWrap: true,
-                         itemCount: list.length,
-                         itemBuilder: (context, i) {
-                           var room = list[i];
-                           var lastContent = room['lastContent'];
-                           var lastMsg = '';
-                           if(lastContent!=null){
-                             var lastContent = json.decode(room['lastContent']);
-                             lastMsg = lastContent['body'];
-                           }
+                      List<DirectRoom> list = snapshot.data;
+                      return ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: list.length,
+                          itemBuilder: (context, i) {
+                            DirectRoom room = list[i];
+                            print(room.otherUserThumbnailUrl);
+                            var lastContent = room.lastContent;
+                            var lastMsg = '';
+                            if (lastContent != null) {
+                              var lastContent = json.decode(room.lastContent);
+                              lastMsg = lastContent['body'];
+                            }
                             return ListTile(
-                              onTap: ()async{
-                                if(room['membership']=='invite'){
-                                  bool joinStatus =  await HelloMatrixFlutter.joinRoom(room['roomId']);
+                              leading: room.otherUserThumbnailUrl == null
+                                  ? Container()
+                                  : CircleAvatar(
+                                      radius: 30.0,
+                                      backgroundImage: NetworkImage(
+                                          room.otherUserThumbnailUrl),
+                                      backgroundColor: Colors.transparent,
+                                    ),
+                              onTap: () async {
+                                if (room.membership == 'invite') {
+                                  bool joinStatus =
+                                      await HelloMatrixFlutter.joinRoom(
+                                          room.roomId);
                                   //print('joinStatus $joinStatus');
-                                  if(joinStatus){
+                                  if (joinStatus) {
                                     Navigator.push(
                                       context,
-                                      MaterialPageRoute(builder: (context) => RoomDetails(roomId: room['roomId'].toString(),)),
+                                      MaterialPageRoute(
+                                          builder: (context) => RoomDetails(
+                                                roomId: room.roomId.toString(),
+                                              )),
                                     );
                                   }
-                                }else {
+                                } else {
                                   Navigator.push(
                                     context,
-                                    MaterialPageRoute(builder: (context) =>
-                                        RoomDetails(
-                                          roomId: room['roomId'].toString(),)),
+                                    MaterialPageRoute(
+                                        builder: (context) => RoomDetails(
+                                              roomId: room.roomId.toString(),
+                                            )),
                                   );
                                 }
                               },
-                             title: Text(room['roomName'].toString()),
+                              title: Text(room.otherUserDisplayName.toString()),
                               subtitle: Text(lastMsg),
                             );
-                         });
+                          });
                     }),
               ),
               Text('Users'),
@@ -121,8 +194,9 @@ class _MyAppState extends State<MyApp> {
                 height: 150,
                 child: StreamBuilder(
                     stream: HelloMatrixFlutter.liveUserList,
-                    builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-                      if(snapshot==null || !snapshot.hasData)
+                    builder: (BuildContext context,
+                        AsyncSnapshot<dynamic> snapshot) {
+                      if (snapshot == null || !snapshot.hasData)
                         return Container();
                       List<dynamic> list = json.decode(snapshot.data);
                       return ListView.builder(
@@ -131,13 +205,21 @@ class _MyAppState extends State<MyApp> {
                           itemBuilder: (context, i) {
                             var user = list[i];
                             return ListTile(
-                              title: user['displayName']!=null?Text(user['displayName']):Text('N/A'),
+                              title: user['displayName'] != null
+                                  ? Text(user['displayName'])
+                                  : Text('N/A'),
                               subtitle: Text(user['userId'].toString()),
-                              onTap: ()async{
-                                String result = await HelloMatrixFlutter.createDirectRoom(user['userId'].toString(),user['displayName'].toString());
+                              onTap: () async {
+                                String result =
+                                    await HelloMatrixFlutter.createDirectRoom(
+                                        user['userId'].toString(),
+                                        user['displayName'].toString());
                                 Navigator.push(
                                   context,
-                                  MaterialPageRoute(builder: (context) => RoomDetails(roomId: result,)),
+                                  MaterialPageRoute(
+                                      builder: (context) => RoomDetails(
+                                            roomId: result,
+                                          )),
                                 );
                                 print(result);
                               },
@@ -156,5 +238,4 @@ class _MyAppState extends State<MyApp> {
       ),
     );
   }
-
 }

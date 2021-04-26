@@ -1,7 +1,6 @@
 package com.hello.hello_matrix_flutter.src.rooms;
 
 import android.os.Build;
-import android.util.EventLog;
 import android.util.Log;
 
 import androidx.annotation.RequiresApi;
@@ -13,20 +12,13 @@ import com.hello.hello_matrix_flutter.src.auth.SessionHolder;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.matrix.android.sdk.api.session.crypto.MXCryptoError;
-import org.matrix.android.sdk.api.session.events.model.Event;
 import org.matrix.android.sdk.api.session.room.Room;
-import org.matrix.android.sdk.api.session.room.model.RoomSummary;
 import org.matrix.android.sdk.api.session.room.timeline.Timeline;
 import org.matrix.android.sdk.api.session.room.timeline.TimelineEvent;
 import org.matrix.android.sdk.api.session.room.timeline.TimelineSettings;
-import org.matrix.android.sdk.internal.crypto.MXEventDecryptionResult;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import io.flutter.plugin.common.EventChannel;
 

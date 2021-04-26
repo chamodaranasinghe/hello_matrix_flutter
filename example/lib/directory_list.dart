@@ -1,9 +1,6 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:hello_matrix_flutter/hello_matrix_flutter.dart';
 import 'package:hello_matrix_flutter_example/room_details.dart';
-import 'package:http/http.dart';
 
 class DirectoryList extends StatefulWidget {
   @override
@@ -12,11 +9,11 @@ class DirectoryList extends StatefulWidget {
 
 class _DirectoryListState extends State<DirectoryList> {
   bool _loading = true;
-  List<dynamic> _contactList = [];
+  List<Profile> _directory = [];
 
   @override
   void initState() {
-    loadContacts();
+    loadDirectory();
     super.initState();
   }
 
@@ -30,26 +27,37 @@ class _DirectoryListState extends State<DirectoryList> {
             padding: EdgeInsets.all(8),
             child: ListView.builder(
                 shrinkWrap: true,
-                itemCount: _contactList.length,
+                itemCount: _directory.length,
                 itemBuilder: (context, i) {
-                  var contact = _contactList[i];
-                  String userId = '@${contact['unique_code']}:h1.hellodesk.app';
+                  var profile = _directory[i];
+                  String userId = '@${profile.helloId}:h1.hellodesk.app';
+                  print(profile.displayName);
                   return ListTile(
-                    title: Text(contact['unique_code']),
-                    subtitle: Text(contact['email'].toString()),
+                    leading: CircleAvatar(
+                      radius: 30.0,
+                      backgroundImage:
+                      NetworkImage(profile.thumbnailUrl),
+                      backgroundColor: Colors.transparent,
+                    ),
+                    title: Text(profile.displayName),
+                    subtitle: Text(profile.email),
                     onTap: () async {
-                      String result = await HelloMatrixFlutter.createDirectRoom(userId,contact['unique_code']);
+                      String result = await HelloMatrixFlutter.createDirectRoom(
+                          userId, profile.helloId);
                       Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => RoomDetails(roomId: result,),
-                      ));
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => RoomDetails(
+                              roomId: result,
+                            ),
+                          ));
                     },
                   );
                 }),
           );
   }
 
-  void loadContacts() async {
+  /*void loadContacts() async {
     Response response = await get(Uri.parse(
         'https://admin.hellodesk.app/_ma1sd/backend/api/v1/directory_test'));
     if (response.statusCode == 200) {
@@ -61,5 +69,12 @@ class _DirectoryListState extends State<DirectoryList> {
         });
       });
     }
+  }*/
+
+  void loadDirectory() async {
+    this._directory = await Directory.retrieveDirectory();
+    setState(() {
+      _loading = false;
+    });
   }
 }

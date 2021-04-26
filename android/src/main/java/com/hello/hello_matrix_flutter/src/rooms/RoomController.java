@@ -9,7 +9,6 @@ import org.jetbrains.annotations.NotNull;
 import org.matrix.android.sdk.api.MatrixCallback;
 import org.matrix.android.sdk.api.session.room.Room;
 import org.matrix.android.sdk.api.session.room.model.create.CreateRoomParams;
-import org.matrix.android.sdk.api.session.room.model.create.CreateRoomPreset;
 import org.matrix.android.sdk.api.session.room.model.message.MessageType;
 
 import java.util.ArrayList;

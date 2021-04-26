@@ -1,81 +1,55 @@
 import 'dart:async';
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
+import 'package:hello_matrix_flutter/src/auth/auth.dart';
+export 'package:hello_matrix_flutter/src/rooms/live_direct_rooms.dart';
+export 'package:hello_matrix_flutter/src/directory/live_directory.dart';
+export 'package:hello_matrix_flutter/src/directory/directory_bloc.dart';
+export 'package:hello_matrix_flutter/src/auth/auth.dart';
+export 'package:hello_matrix_flutter/src/models/profile.dart';
+export 'package:hello_matrix_flutter/src/models/direct_room.dart';
 
 class HelloMatrixFlutter {
   static const MethodChannel _channel =
       const MethodChannel('hello_matrix_flutter');
 
-  static const EventChannel _channelRoomList =
-      const EventChannel('hello_matrix_flutter/roomListEvents');
-
   static const EventChannel _channelUserList =
-  const EventChannel('hello_matrix_flutter/userListEvents');
+      const EventChannel('hello_matrix_flutter/userListEvents');
 
   static const EventChannel _channelTimelineEvents =
-  const EventChannel('hello_matrix_flutter/timelineEvents');
+      const EventChannel('hello_matrix_flutter/timelineEvents');
 
-  static Future<bool> checkSession() async {
-    final bool result = await _channel.invokeMethod("checkSession");
+  static Future<String> createDirectRoom(String userId, String roomName) async {
+    final String result = await _channel.invokeMethod(
+        "createDirectRoom", {'userId': userId, 'roomName': roomName});
     return result;
   }
 
-  static Future<bool> login(
-      String homeServer, String username, String password) async {
-    final bool result = await _channel.invokeMethod("login", {
-      'homeServer': homeServer,
-      'username': username,
-      'password': password,
-    });
-    return result;
-  }
-
-  static Future<bool> logout() async {
-    final bool result = await _channel.invokeMethod("logout");
-    return result;
-  }
-
-  static Future<String> createDirectRoom(
-      String userId, String roomName) async {
-    final String result = await _channel.invokeMethod("createDirectRoom", {
-      'userId': userId,
-      'roomName':roomName
-    });
-    return result;
-  }
-
-  static Future<bool> sendSimpleTextMessage(
-      String roomId, String body) async {
+  static Future<bool> sendSimpleTextMessage(String roomId, String body) async {
     final bool result = await _channel.invokeMethod("sendSimpleTextMessage", {
       'roomId': roomId,
       'body': body,
     });
     return result;
   }
-  static Future<bool> joinRoom(
-      String roomId) async {
-    final bool result = await _channel.invokeMethod("joinRoom", {
-      'roomId': roomId
-    });
+
+  static Future<bool> joinRoom(String roomId) async {
+    final bool result =
+        await _channel.invokeMethod("joinRoom", {'roomId': roomId});
     return result;
   }
 
-  static Future<void> createTimeLine(String roomId) async{
-    await _channel.invokeMethod("createTimeLine", {
-      'roomId': roomId
-    });
+  static Future<void> createTimeLine(String roomId) async {
+    await _channel.invokeMethod("createTimeLine", {'roomId': roomId});
     return;
   }
 
-  static Future<void> destroyTimeLine() async{
+  static Future<void> destroyTimeLine() async {
     await _channel.invokeMethod("destroyTimeLine");
     return;
   }
 
-  static Stream get liveRoomList => _channelRoomList.receiveBroadcastStream();
-
   static Stream get liveUserList => _channelUserList.receiveBroadcastStream();
 
-  static Stream get liveTimeLine => _channelTimelineEvents.receiveBroadcastStream();
+  static Stream get liveTimeLine =>
+      _channelTimelineEvents.receiveBroadcastStream();
 }

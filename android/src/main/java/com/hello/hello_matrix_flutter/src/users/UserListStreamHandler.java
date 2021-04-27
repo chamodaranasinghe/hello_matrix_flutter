@@ -3,6 +3,8 @@ package com.hello.hello_matrix_flutter.src.users;
 import androidx.lifecycle.Observer;
 
 import com.hello.hello_matrix_flutter.src.auth.SessionHolder;
+import com.hello.hello_matrix_flutter.src.directory.DirectoryConnector;
+import com.hello.hello_matrix_flutter.src.directory.UserProfile;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -26,14 +28,26 @@ public class UserListStreamHandler implements EventChannel.StreamHandler {
                 for (User user : users) {
                     JSONObject j = new JSONObject();
                     try {
-                        if(user.getUserId().equals(SessionHolder.matrixSession.getMyUserId())) {
+                        if (user.getUserId().equals(SessionHolder.matrixSession.getMyUserId())) {
 
-                        }else{
-                            j.put("displayName", user.getDisplayName());
-                            j.put("userId", user.getUserId());
+                        } else {
+                            UserProfile p = DirectoryConnector.pullUserProfile(user.getUserId());
+                            j.put("hello_id", p.getHelloId());
+                            j.put("first_name", p.getFirstName());
+                            j.put("last_name", p.getLastName());
+                            j.put("email", p.getEmail());
+                            j.put("contact", p.getContact());
+                            j.put("job_title", p.getJobTitle());
+                            j.put("photo", p.getPhotoUrl());
+                            j.put("thumbnail", p.getPhotoThumbnail());
+                            j.put("org_prefix", p.getOrgPrefix());
+                            j.put("org_name", p.getOrgName());
+                            j.put("org_contact", p.getOrgContact());
+                            j.put("org_website", p.getOrgWebsite());
+                            j.put("mxUserId", user.getUserId());
                             jsonArrayUsers.put(j);
                         }
-                    }catch (Exception e){
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
                 }

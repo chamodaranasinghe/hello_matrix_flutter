@@ -192,28 +192,26 @@ class _MyAppState extends State<MyApp> {
               Text('Users'),
               Container(
                 height: 150,
-                child: StreamBuilder(
+                child: StreamBuilder<List<Profile>>(
                     stream: HelloMatrixFlutter.liveUserList,
                     builder: (BuildContext context,
                         AsyncSnapshot<dynamic> snapshot) {
                       if (snapshot == null || !snapshot.hasData)
                         return Container();
-                      List<dynamic> list = json.decode(snapshot.data);
+                      List<Profile> list = snapshot.data;
                       return ListView.builder(
                           shrinkWrap: true,
                           itemCount: list.length,
                           itemBuilder: (context, i) {
-                            var user = list[i];
+                            Profile user = list[i];
                             return ListTile(
-                              title: user['displayName'] != null
-                                  ? Text(user['displayName'])
-                                  : Text('N/A'),
-                              subtitle: Text(user['userId'].toString()),
+                              title: Text('${user.firstName} ${user.lastName}'),
+                              subtitle: Text(user.email),
                               onTap: () async {
                                 String result =
                                     await HelloMatrixFlutter.createDirectRoom(
-                                        user['userId'].toString(),
-                                        user['displayName'].toString());
+                                        user.mxUserId,
+                                        user.firstName.toString());
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(

@@ -12,4 +12,5 @@ class Profile{
   String orgName;
   String orgContact;
   String orgWebsite;
+  String mxUserId;
 }

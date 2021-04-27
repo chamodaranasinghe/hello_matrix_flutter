@@ -32,20 +32,23 @@ public class UserListStreamHandler implements EventChannel.StreamHandler {
 
                         } else {
                             UserProfile p = DirectoryConnector.pullUserProfile(user.getUserId());
-                            j.put("hello_id", p.getHelloId());
-                            j.put("first_name", p.getFirstName());
-                            j.put("last_name", p.getLastName());
-                            j.put("email", p.getEmail());
-                            j.put("contact", p.getContact());
-                            j.put("job_title", p.getJobTitle());
-                            j.put("photo", p.getPhotoUrl());
-                            j.put("thumbnail", p.getPhotoThumbnail());
-                            j.put("org_prefix", p.getOrgPrefix());
-                            j.put("org_name", p.getOrgName());
-                            j.put("org_contact", p.getOrgContact());
-                            j.put("org_website", p.getOrgWebsite());
-                            j.put("mxUserId", user.getUserId());
-                            jsonArrayUsers.put(j);
+                            if(p!=null){
+                                j.put("hello_id", p.getHelloId());
+                                j.put("first_name", p.getFirstName());
+                                j.put("last_name", p.getLastName());
+                                j.put("email", p.getEmail());
+                                j.put("contact", p.getContact());
+                                j.put("job_title", p.getJobTitle());
+                                j.put("photo", p.getPhotoUrl());
+                                j.put("thumbnail", p.getPhotoThumbnail());
+                                j.put("org_prefix", p.getOrgPrefix());
+                                j.put("org_name", p.getOrgName());
+                                j.put("org_contact", p.getOrgContact());
+                                j.put("org_website", p.getOrgWebsite());
+                                j.put("mxUserId", user.getUserId());
+                                jsonArrayUsers.put(j);
+                            }
+
                         }
                     } catch (Exception e) {
                         e.printStackTrace();

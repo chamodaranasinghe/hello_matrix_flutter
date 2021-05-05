@@ -43,6 +43,13 @@ android {
             signingConfig signingConfigs.debug
         }
     }
+    compileOptions {
+        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_1_8
+    }
+    dependenciesInfo {
+        includeInBundle false
+    }
 }
 
 flutter {

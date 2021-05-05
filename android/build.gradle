@@ -6,6 +6,7 @@ buildscript {
         google()
         jcenter()
         maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
+        mavenCentral()
     }
 
     dependencies {
@@ -30,22 +31,34 @@ android {
     defaultConfig {
         minSdkVersion 25
     }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    lintOptions {
+        abortOnError false
+    }
 }
 
 dependencies {
     def retrofit_version = '2.9.0'
     def room_version = "2.3.0"
-    implementation 'com.github.matrix-org:matrix-android-sdk2:v0.0.1'
     implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
     implementation "com.squareup.retrofit2:converter-moshi:$retrofit_version"
+
     implementation(platform("com.squareup.okhttp3:okhttp-bom:4.9.1"))
     implementation 'com.squareup.okhttp3:okhttp'
     implementation 'com.squareup.okhttp3:logging-interceptor'
     implementation 'com.squareup.okhttp3:okhttp-urlconnection'
     implementation 'com.airbnb.okreplay:okreplay:1.5.0'
     implementation 'com.google.code.gson:gson:2.8.6'
+
+    implementation 'com.squareup.okhttp3:okhttp:4.9.0'
+    implementation 'com.squareup.okhttp3:logging-interceptor:4.9.0'
+
     implementation 'org.matrix.gitlab.matrix-org:olm:3.2.2'
     implementation "androidx.room:room-runtime:$room_version"
     annotationProcessor "androidx.room:room-compiler:$room_version"
     implementation 'org.apache.commons:commons-collections4:4.4'
+    implementation 'com.github.matrix-org:matrix-android-sdk2:v1.1.5'
 }

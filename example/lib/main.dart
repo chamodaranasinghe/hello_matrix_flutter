@@ -6,6 +6,7 @@ import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:hello_matrix_flutter/hello_matrix_flutter.dart';
 import 'package:hello_matrix_flutter_example/directory_list.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'room_details.dart';
 
 void main() {
@@ -41,7 +42,7 @@ class _MyAppState extends State<MyApp> {
   Future<void> checkSession() async {
     bool status = await Auth.checkSession();
 
-    print(status);
+    //print(status);
     setState(() {
       _sessionStatusBool = status;
       // ignore: unnecessary_statements
@@ -69,7 +70,7 @@ class _MyAppState extends State<MyApp> {
                   onPressed: !_sessionStatusBool
                       ? () async {
                           await Auth.login('https://h1.hellodesk.app',
-                              'judith@gmail.com', 'abc123');
+                              'chamodar@gmail.com', 'abc123');
                           await checkSession();
                         }
                       : null),
@@ -142,7 +143,6 @@ class _MyAppState extends State<MyApp> {
                           itemCount: list.length,
                           itemBuilder: (context, i) {
                             DirectRoom room = list[i];
-                            print(room.otherUserThumbnailUrl);
                             var lastContent = room.lastContent;
                             var lastMsg = '';
                             if (lastContent != null) {
@@ -150,18 +150,31 @@ class _MyAppState extends State<MyApp> {
                               lastMsg = lastContent['body'];
                             }
                             return ListTile(
-                              leading: room.otherUserThumbnailUrl == null
-                                  ? Container()
-                                  : CircleAvatar(
-                                      radius: 30.0,
-                                      backgroundImage: NetworkImage(
-                                          room.otherUserThumbnailUrl),
-                                      backgroundColor: Colors.transparent,
+                              leading: CachedNetworkImage(
+                                imageUrl: room.otherUserThumbnailUrl,
+                                imageBuilder: (context, imageProvider) =>
+                                    Container(
+                                  height: 50,
+                                  width: 50,
+                                  decoration: BoxDecoration(
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(200)),
+                                    image: DecorationImage(
+                                      image: imageProvider,
+                                      fit: BoxFit.cover,
                                     ),
+                                  ),
+                                ),
+                                placeholder: (context, url) =>
+                                    CircularProgressIndicator(),
+                                errorWidget: (context, url, error) =>
+                                    Icon(Icons.error),
+                              ),
                               onTap: () async {
+                                print(room.roomId);
                                 if (room.membership == 'invite') {
                                   bool joinStatus =
-                                      await HelloMatrixFlutter.joinRoom(
+                                      await RoomController.joinRoom(
                                           room.roomId);
                                   //print('joinStatus $joinStatus');
                                   if (joinStatus) {
@@ -209,7 +222,7 @@ class _MyAppState extends State<MyApp> {
                               subtitle: Text(user.email),
                               onTap: () async {
                                 String result =
-                                    await HelloMatrixFlutter.createDirectRoom(
+                                    await RoomController.createDirectRoom(
                                         user.mxUserId,
                                         user.firstName.toString());
                                 Navigator.push(
@@ -219,7 +232,7 @@ class _MyAppState extends State<MyApp> {
                                             roomId: result,
                                           )),
                                 );
-                                print(result);
+                                //print(result);
                               },
                             );
                           });

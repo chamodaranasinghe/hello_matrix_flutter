@@ -48,7 +48,7 @@ public class RoomListStreamHandler implements EventChannel.StreamHandler {
                         roomSummaryLite.originServerLastEventTs = 0;
                         roomSummaryLite.localLastEventTs = 0;
                     }
-                    roomSummaryLite.membership = room.getMembership().getValue();
+                    roomSummaryLite.membership = room.getMembership().toString();
                     roomSummaryLite.lastEvent = room.getLatestPreviewableEvent();
 
                     if (!room.getOtherMemberIds().isEmpty()) {

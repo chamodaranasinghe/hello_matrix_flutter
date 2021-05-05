@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hello_matrix_flutter/hello_matrix_flutter.dart';
 import 'package:hello_matrix_flutter_example/room_details.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class DirectoryList extends StatefulWidget {
   @override
@@ -33,16 +34,33 @@ class _DirectoryListState extends State<DirectoryList> {
                   String userId = '@${profile.helloId}:h1.hellodesk.app';
                   print(profile.displayName);
                   return ListTile(
-                    leading: CircleAvatar(
+                    leading: CachedNetworkImage(
+                      imageUrl: profile.thumbnailUrl,
+                      imageBuilder: (context, imageProvider) => Container(
+                        height: 50,
+                        width: 50,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.all(Radius.circular(200)),
+                          image: DecorationImage(
+                            image: imageProvider,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ),
+                      placeholder: (context, url) =>
+                          CircularProgressIndicator(),
+                      errorWidget: (context, url, error) => Icon(Icons.error),
+                    ),
+                    /*CircleAvatar(
                       radius: 30.0,
                       backgroundImage:
                       NetworkImage(profile.thumbnailUrl),
                       backgroundColor: Colors.transparent,
-                    ),
+                    ),*/
                     title: Text(profile.displayName),
                     subtitle: Text(profile.email),
                     onTap: () async {
-                      String result = await HelloMatrixFlutter.createDirectRoom(
+                      String result = await RoomController.createDirectRoom(
                           userId, profile.helloId);
                       Navigator.push(
                           context,

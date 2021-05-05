@@ -3,7 +3,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     >
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+
     <application
+        android:requestLegacyExternalStorage="true"
         tools:replace="android:label"
         android:label="hello_matrix_flutter_example"
         android:icon="@mipmap/ic_launcher">

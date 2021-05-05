@@ -12,7 +12,10 @@ dependencies:
   flutter:
     sdk: flutter
   http: ^0.13.1
-
+  cached_network_image: ^3.0.0
+  image_picker: ^0.7.4
+  image_size_getter: ^1.0.0
+  storage_path: ^0.2.0
   hello_matrix_flutter:
     # When depending on this package from a real application you should use:
     #   hello_matrix_flutter: ^x.y.z

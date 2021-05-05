@@ -21,12 +21,15 @@ import org.json.JSONObject;
 import org.matrix.android.sdk.api.MatrixCallback;
 import org.matrix.android.sdk.api.auth.data.HomeServerConnectionConfig;
 import org.matrix.android.sdk.api.auth.data.LoginFlowResult;
+import org.matrix.android.sdk.api.auth.login.LoginWizard;
 import org.matrix.android.sdk.api.session.Session;
 
 import java.io.IOException;
 
 import io.flutter.plugin.common.MethodChannel;
 import kotlin.Unit;
+import kotlin.coroutines.Continuation;
+import kotlin.coroutines.CoroutineContext;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.HttpUrl;
@@ -171,7 +174,7 @@ public class LoginController {
         HomeServerConnectionConfig homeServerConnectionConfig = null;
         try {
             homeServerConnectionConfig = new HomeServerConnectionConfig.Builder()
-                    .withHomeServerUri(Uri.parse(homeServer))
+                    .withHomeServerUri(homeServer)
                     .build();
         } catch (Exception e) {
             handleLoginResponseOnMainThread(result, false);
@@ -179,26 +182,56 @@ public class LoginController {
             return;
         }
 
-        SessionHolder.getMatrixInstance().authenticationService().getLoginFlow(homeServerConnectionConfig, new MatrixCallback<LoginFlowResult>() {
+        LoginFlowResult loginFlowResult = (LoginFlowResult) SessionHolder.getMatrixInstance().authenticationService().getLoginFlow(homeServerConnectionConfig, new Continuation<LoginFlowResult>() {
+            @Override
+            public @NotNull CoroutineContext getContext() {
+                return null;
+            }
+
+            @Override
+            public void resumeWith(@NotNull Object o) {
+                //LoginFlowResult lfResult = (LoginFlowResult) o;
+                LoginWizard loginWizard = SessionHolder.getMatrixInstance().authenticationService().getLoginWizard();
+
+            }
+        });
+        handleLoginResponseOnMainThread(result, false);
+        return;
+
+        /*loginWizard.login(userName, password, (android.os.Build.MANUFACTURER + android.os.Build.MODEL), new Continuation<Session>() {
+            @Override
+            public @NotNull CoroutineContext getContext() {
+                handleLoginResponseOnMainThread(result, false);
+                return null;
+            }
+
+            @Override
+            public void resumeWith(@NotNull Object o) {
+                Session session = (Session)o;
+                SessionHolder.matrixSession = session;
+                SessionHolder.matrixSession.open();
+                SessionHolder.matrixSession.startSync(true);
+                //store profile data
+                DataStorage dataStorage = new DataStorage();
+                dataStorage.storeStringData(DataStorage.KEY_PROFILE_STORAGE, profileData);
+                ///
+                //setDisplayNameFromProfile(result, dataStorage);
+                handleLoginResponseOnMainThread(result, true);
+            }
+        });*/
+
+       /* SessionHolder.getMatrixInstance().authenticationService().getLoginFlow(homeServerConnectionConfig, new MatrixCallback<LoginFlowResult>() {
             @Override
             public void onSuccess(LoginFlowResult loginFlowResult) {
                 SessionHolder.getMatrixInstance().authenticationService().getLoginWizard().login(userName, password, (android.os.Build.MANUFACTURER + android.os.Build.MODEL), new MatrixCallback<Session>() {
                     @Override
                     public void onSuccess(Session session) {
-                        SessionHolder.matrixSession = session;
-                        SessionHolder.matrixSession.open();
-                        SessionHolder.matrixSession.startSync(true);
-                        //store profile data
-                        DataStorage dataStorage = new DataStorage();
-                        dataStorage.storeStringData(DataStorage.KEY_PROFILE_STORAGE, profileData);
-                        ///
-                        //setDisplayNameFromProfile(result, dataStorage);
-                        handleLoginResponseOnMainThread(result, true);
+
                     }
 
                     @Override
                     public void onFailure(@NotNull Throwable throwable) {
-                        handleLoginResponseOnMainThread(result, false);
+
                         //result.error("", throwable.toString(), false);
                         return;
                     }
@@ -211,7 +244,7 @@ public class LoginController {
                 //result.error("", throwable.toString(), false);
                 return;
             }
-        });
+        });*/
     }
 
     //step 4->set display name
@@ -252,7 +285,33 @@ public class LoginController {
         }
 
         try {
-            SessionHolder.matrixSession.signOut(true, new MatrixCallback<Unit>() {
+
+            SessionHolder.matrixSession.signOut(true, new Continuation<Unit>() {
+                @Override
+                public @NotNull CoroutineContext getContext() {
+                    if (result != null) {
+                        result.success(false);
+                    }
+                    return null;
+                }
+
+                @Override
+                public void resumeWith(@NotNull Object o) {
+                    SessionHolder.matrixSession = null;
+                    //erase all SP data
+                    DataStorage dataStorage = new DataStorage();
+                    dataStorage.eraseAllData();
+
+                    //erase directory
+                    new DirectoryController().eraseDirectory();
+                    //////////////////////////
+                    if (result != null) {
+                        result.success(true);
+                    }
+                }
+            });
+
+            /*SessionHolder.matrixSession.signOut(true, new MatrixCallback<Unit>() {
                 @Override
                 public void onSuccess(Unit unit) {
                     SessionHolder.matrixSession = null;
@@ -276,7 +335,7 @@ public class LoginController {
                     }
 
                 }
-            });
+            });*/
         } catch (Exception e) {
             if (result != null) {
                 result.error("-1", "Sync is still running", false);

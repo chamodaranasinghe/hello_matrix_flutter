@@ -1,4 +1,4 @@
-package com.hello.hello_matrix_flutter.src.rooms;
+package com.hello.hello_matrix_flutter.src.timeline;
 
 import org.matrix.android.sdk.api.session.events.model.EventType;
 

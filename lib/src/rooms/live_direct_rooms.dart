@@ -18,6 +18,8 @@ class LiveDirectRooms {
             directRoom.roomId = e['roomId'];
             directRoom.otherUserDisplayName = e['otherMemberDisplayName'];
             directRoom.otherUserThumbnailUrl = e['otherMemberThumbnail'];
+            directRoom.otherUserMatrixId = e['otherUserMatrixId'];
+            directRoom.otherUserHelloId = e['otherUserHelloId'];
             directRoom.localLastEventTs = e['localLastEventTs'];
             directRoom.originServerLastEventTs = e['originServerLastEventTs'];
             directRoom.notificationCount = e['notificationCount'];

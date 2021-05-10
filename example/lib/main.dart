@@ -6,11 +6,20 @@ import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:hello_matrix_flutter/hello_matrix_flutter.dart';
 import 'package:hello_matrix_flutter_example/directory_list.dart';
+import 'package:hello_matrix_flutter_example/voip_call/call_sample.dart';
+import 'package:hello_matrix_flutter_example/voip_call/signaling.dart';
 import 'room_details.dart';
+import 'package:get_it/get_it.dart';
+import 'package:flutter_callkeep/flutter_callkeep.dart';
 
-void main() {
+GetIt getIt = GetIt.instance;
+
+void main() async {
+  //call keep
+  WidgetsFlutterBinding.ensureInitialized();
+  await CallKeep.setup();
+  //call keep
   runApp(MyApp());
-
   runApp(
     MaterialApp(
       debugShowCheckedModeBanner: false,
@@ -32,6 +41,15 @@ class _MyAppState extends State<MyApp> {
   String _sessionStatus = 'Unknown';
   bool _sessionStatusBool = false;
 
+  Future<void> displayIncomingCall() async {
+    await CallKeep.askForPermissionsIfNeeded(context);
+    final callUUID = '0783a8e5-8353-4802-9448-c6211109af51';
+    final number = '+46 70 123 45 67';
+
+    await CallKeep.displayIncomingCall(
+        callUUID, number, number, HandleType.number, false);
+  }
+
   @override
   void initState() {
     super.initState();
@@ -40,18 +58,59 @@ class _MyAppState extends State<MyApp> {
 
   Future<void> checkSession() async {
     bool status = await Auth.checkSession();
-
+    Profile p = await Auth.getHelloProfile();
     print(status);
     setState(() {
       _sessionStatusBool = status;
       // ignore: unnecessary_statements
       if (status) {
+        if (p != null) {
+          //register call signalling singleton if logged in and already have a session and profile available
+          if (!getIt.isRegistered<Signaling>()) {
+            getIt.registerSingleton<Signaling>(
+                Signaling('demo.cloudwebrtc.com', p.helloId));
+            signallingInstance..connect();
+
+            //registering call actions
+            _registerCallActions();
+
+          }
+        }
+
         _sessionStatus = 'Logged in : True';
       } else {
         _sessionStatus = 'Logged in : False';
       }
     });
   }
+
+  _registerCallActions(){
+    CallKeep.didReceiveStartCallAction.listen((event) {
+      //print('didReceiveStartCallAction $event');
+      //print('didReceiveStartCallActionABC');
+      signallingInstance.accept();
+    });
+    CallKeep.didActivateAudioSession.listen((event) {
+      //print('didActivateAudioSessionABC $event');
+    });
+    CallKeep.didDeactivateAudioSession.listen((event) {
+      //print('didDeactivateAudioSessionABC $event');
+    });
+    CallKeep.performEndCallAction.listen((event) {
+      //print('performEndCallActionABC $event');
+      //print('performEndCallAction $event');
+      signallingInstance.reject();
+    });
+    CallKeep.performAnswerCallAction.listen((event) {
+      //print('performAnswerCallActionABC $event');
+      /*print('signallingInstance $signallingInstance');
+      print('performAnswerCallAction');
+      print('signallingInstance $signallingInstance');
+      signallingInstance.accept();*/
+      signallingInstance.accept();
+    });
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -69,7 +128,7 @@ class _MyAppState extends State<MyApp> {
                   onPressed: !_sessionStatusBool
                       ? () async {
                           await Auth.login('https://h1.hellodesk.app',
-                              'judith@gmail.com', 'abc123');
+                              'calluser1@mailinator.com', 'abc123');
                           await checkSession();
                         }
                       : null),
@@ -125,6 +184,23 @@ class _MyAppState extends State<MyApp> {
                               print(b);
                             }
                           : null),
+                  ElevatedButton(
+                      onPressed: () async {
+                        Profile p = await Auth.getHelloProfile();
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => CallSample(
+                                    /*host: 'demo.cloudwebrtc.com',
+                                    helloId: p.helloId,*/
+                                  )),
+                        );
+                      },
+                      child: Icon(Icons.add_call)),
+                  ElevatedButton(
+                      onPressed: () async {
+                        this.displayIncomingCall();
+                      }, child: Icon(Icons.call))
                 ],
               ),
               Text('Rooms'),
@@ -170,6 +246,9 @@ class _MyAppState extends State<MyApp> {
                                       MaterialPageRoute(
                                           builder: (context) => RoomDetails(
                                                 roomId: room.roomId.toString(),
+                                                otherUserHelloId: room
+                                                    .otherUserHelloId
+                                                    .toString(),
                                               )),
                                     );
                                   }
@@ -179,6 +258,9 @@ class _MyAppState extends State<MyApp> {
                                     MaterialPageRoute(
                                         builder: (context) => RoomDetails(
                                               roomId: room.roomId.toString(),
+                                              otherUserHelloId: room
+                                                  .otherUserHelloId
+                                                  .toString(),
                                             )),
                                   );
                                 }

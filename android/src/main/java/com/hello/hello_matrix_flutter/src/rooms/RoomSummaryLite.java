@@ -15,6 +15,8 @@ public class RoomSummaryLite implements Comparable<RoomSummaryLite> {
     TimelineEvent lastEvent;
     String otherMemberDisplayName;
     String otherMemberThumbnail;
+    String otherUserHelloId;
+    String otherUserMatrixId;
 
     @Override
     public int compareTo(RoomSummaryLite old) {

@@ -25,8 +25,8 @@ public class RoomController {
 
     public void createDirectRoom(@NonNull final MethodChannel.Result result, final String userId, String roomName) {
         Room existingRoom = SessionHolder.matrixSession.getExistingDirectRoomWithUser(userId);
-        if(existingRoom!=null){
-            Log.i(_tag, "room already exist"+" "+existingRoom.getRoomId());
+        if (existingRoom != null) {
+            Log.i(_tag, "room already exist" + " " + existingRoom.getRoomId());
             result.success(existingRoom.getRoomId());
             return;
         }
@@ -55,23 +55,24 @@ public class RoomController {
         });
     }
 
-    public void sendSimpleTextMessage(@NonNull final MethodChannel.Result result, String roomId, String body){
+    public void sendSimpleTextMessage(@NonNull final MethodChannel.Result result, String roomId, String body) {
         Room room = SessionHolder.matrixSession.getRoom(roomId);
-        room.sendTextMessage(body, MessageType.MSGTYPE_TEXT,false);
+        room.sendTextMessage(body, MessageType.MSGTYPE_TEXT, false);
         result.success(true);
     }
 
-    public void createTimeLine(String roomId){
+    public void createTimeLine(String roomId) {
         chatTimeLine = new ChatTimeLine(roomId);
+
     }
 
-    public void joinRoom(@NonNull final MethodChannel.Result result,String roomId){
+    public void joinRoom(@NonNull final MethodChannel.Result result, String roomId) {
         Room room = SessionHolder.matrixSession.getRoom(roomId);
         room.join("", new ArrayList<String>(), new MatrixCallback<Unit>() {
             @Override
             public void onSuccess(Unit unit) {
                 result.success(true);
-                Log.i("Unit",unit.toString());
+                Log.i("Unit", unit.toString());
             }
 
             @Override
@@ -81,7 +82,7 @@ public class RoomController {
         });
     }
 
-    public void destroyTimeLine(){
+    public void destroyTimeLine() {
         chatTimeLine.destroyTimeLine();
         chatTimeLine = null;
     }

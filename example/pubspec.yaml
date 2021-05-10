@@ -12,6 +12,9 @@ dependencies:
   flutter:
     sdk: flutter
   http: ^0.13.1
+  flutter_webrtc: ^0.6.3
+  get_it: ^6.0.0
+  flutter_callkeep: ^0.1.8
 
   hello_matrix_flutter:
     # When depending on this package from a real application you should use:

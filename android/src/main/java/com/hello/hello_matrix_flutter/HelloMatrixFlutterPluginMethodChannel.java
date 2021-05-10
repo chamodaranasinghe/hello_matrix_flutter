@@ -5,6 +5,7 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 
 import com.hello.hello_matrix_flutter.src.auth.LoginController;
+import com.hello.hello_matrix_flutter.src.call.CallController;
 import com.hello.hello_matrix_flutter.src.directory.DirectoryController;
 import com.hello.hello_matrix_flutter.src.rooms.RoomController;
 
@@ -16,11 +17,13 @@ public class HelloMatrixFlutterPluginMethodChannel implements MethodChannel.Meth
     LoginController loginController;
     RoomController roomController;
     DirectoryController directoryController;
+    CallController callController;
 
     public HelloMatrixFlutterPluginMethodChannel() {
         this.loginController = new LoginController();
         this.roomController = new RoomController();
         this.directoryController = new DirectoryController();
+        this.callController = new CallController();
     }
 
     @Override
@@ -60,6 +63,12 @@ public class HelloMatrixFlutterPluginMethodChannel implements MethodChannel.Meth
             case "retrieveDirectory":
                 directoryController.retrieveDirectory(result);
                 break;
+
+            //calling
+            case "getTurnServerCredentials":
+                callController.getTurnServerCredentials(result);
+                break;
+
             default:
                 result.notImplemented();
                 return;

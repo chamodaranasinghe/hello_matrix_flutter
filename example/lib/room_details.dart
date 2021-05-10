@@ -4,11 +4,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:hello_matrix_flutter/hello_matrix_flutter.dart';
+import 'package:hello_matrix_flutter_example/voip_call/audio_cal_screen.dart';
+import 'package:hello_matrix_flutter_example/voip_call/call_sample.dart';
+import 'package:hello_matrix_flutter_example/voip_call/signaling.dart';
 
 class RoomDetails extends StatefulWidget {
   final String roomId;
+  final String otherUserHelloId;
 
-  const RoomDetails({Key key, this.roomId}) : super(key: key);
+  const RoomDetails({Key key, this.roomId, this.otherUserHelloId})
+      : super(key: key);
 
   @override
   _RoomDetailsState createState() => _RoomDetailsState();
@@ -28,6 +33,29 @@ class _RoomDetailsState extends State<RoomDetails> {
     return Scaffold(
       appBar: AppBar(
         title: Text("Chat"),
+        actions: [
+          IconButton(
+              icon: Icon(Icons.video_call),
+              onPressed: () async {
+                print('otherUserHelloId ${widget.otherUserHelloId}');
+                signallingInstance.invite(
+                    widget.otherUserHelloId, 'audio', false);
+
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => AudioCallScreen()),
+                );
+
+                /*Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => CallSample(
+                 */ /* host: 'demo.cloudwebrtc.com',
+                  helloId: p.helloId,*/ /*
+                )),
+          );*/
+              })
+        ],
       ),
       body: Container(
         margin: EdgeInsets.all(8),

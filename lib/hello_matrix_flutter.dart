@@ -9,6 +9,7 @@ export 'package:hello_matrix_flutter/src/directory/directory_bloc.dart';
 export 'package:hello_matrix_flutter/src/auth/auth.dart';
 export 'package:hello_matrix_flutter/src/models/profile.dart';
 export 'package:hello_matrix_flutter/src/models/direct_room.dart';
+export 'package:hello_matrix_flutter/src/call/call_bloc.dart';
 
 class HelloMatrixFlutter {
   static const MethodChannel _channel =

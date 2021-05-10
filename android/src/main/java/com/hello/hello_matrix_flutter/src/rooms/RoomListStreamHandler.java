@@ -1,5 +1,7 @@
 package com.hello.hello_matrix_flutter.src.rooms;
 
+import android.util.Log;
+
 import androidx.lifecycle.Observer;
 
 import com.hello.hello_matrix_flutter.src.auth.SessionHolder;
@@ -53,6 +55,9 @@ public class RoomListStreamHandler implements EventChannel.StreamHandler {
 
                     if (!room.getOtherMemberIds().isEmpty()) {
                         UserProfile userProfile = DirectoryConnector.pullUserProfile(room.getOtherMemberIds().get(0));
+                        roomSummaryLite.otherUserMatrixId = room.getOtherMemberIds().get(0);
+                        roomSummaryLite.otherUserHelloId = userProfile.helloId;
+                        Log.i("otherUserId", room.getOtherMemberIds().get(0));
                         if (userProfile != null) {
                             roomSummaryLite.otherMemberDisplayName = userProfile.firstName + " " + userProfile.lastName;
                             roomSummaryLite.otherMemberThumbnail = userProfile.photoThumbnail;
@@ -64,6 +69,8 @@ public class RoomListStreamHandler implements EventChannel.StreamHandler {
                     } else {
                         roomSummaryLite.otherMemberDisplayName = "";
                         roomSummaryLite.otherMemberThumbnail = null;
+                        roomSummaryLite.otherUserHelloId = null;
+                        roomSummaryLite.otherUserMatrixId = null;
                     }
                     rooms.add(roomSummaryLite);
                 }
@@ -93,6 +100,8 @@ public class RoomListStreamHandler implements EventChannel.StreamHandler {
                         }
                         j.put("otherMemberDisplayName", roomLite.otherMemberDisplayName);
                         j.put("otherMemberThumbnail", roomLite.otherMemberThumbnail);
+                        j.put("otherUserHelloId", roomLite.otherUserHelloId);
+                        j.put("otherUserMatrixId", roomLite.otherUserMatrixId);
 
 
                         jsonArrayRooms.put(j);

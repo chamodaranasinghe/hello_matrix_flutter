@@ -62,13 +62,27 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_callkeep:
+    dependency: "direct main"
+    description:
+      name: flutter_callkeep
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.1.8"
   flutter_test:
     dependency: "direct dev"
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_webrtc:
+    dependency: "direct main"
+    description:
+      name: flutter_webrtc
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.6.3"
   get_it:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: get_it
       url: "https://pub.dartlang.org"
@@ -193,4 +207,4 @@ packages:
     version: "2.1.0"
 sdks:
   dart: ">=2.12.0 <3.0.0"
-  flutter: ">=1.20.0"
+  flutter: ">=1.22.0"
